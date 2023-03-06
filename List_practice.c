@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "common.h"
 
 LIST* Create_NewLIST()
@@ -73,12 +71,39 @@ void Add_NodeLIST(LIST* ptr_target, int val1, int val2, int val3)
 		ptr_target->next = ptr_new;
 	}
 }
-int main()
+void Access_from0_to1000()
 {
+	//リスト構造を利用して100までの数字で1から1000を表示する
 	LIST* ChainResult = Create_NewLIST();
 	for(int vartical = 0; vartical < 100; vartical++)
 	{
-		for(int horizontal = 0; horizontal < 5; horizontal++)
+		for(int horizontal = 1; horizontal <= 10; horizontal++)
+		{
+			Add_NodeLIST(ChainResult, vartical, horizontal, 0);
+			ChainResult = Search_EndLIST(ChainResult);
+		}
+	}
+
+	// for(LIST* Judge = ChainResult->top; Judge != NULL; Judge = Judge->next)
+	// {
+	// 	if(Judge->val1 < 3 || Judge->val1 > 96) 
+	// 	{
+	// 		printf(" %4d,", Judge->val1 * 10 + Judge->val2);
+	// 		if(Judge->val2 == 10) printf("\n");
+	// 	}
+	// }
+	Free_AllLIST(ChainResult);	
+}
+
+int main()
+{
+	begin_time;
+
+	//リスト構造を利用して100までの数字で1から1000を表示する
+	LIST* ChainResult = Create_NewLIST();
+	for(int vartical = 0; vartical < 100; vartical++)
+	{
+		for(int horizontal = 1; horizontal <= 10; horizontal++)
 		{
 			Add_NodeLIST(ChainResult, vartical, horizontal, 0);
 			ChainResult = Search_EndLIST(ChainResult);
@@ -89,11 +114,11 @@ int main()
 	{
 		if(Judge->val1 < 3 || Judge->val1 > 96) 
 		{
-			if(Judge->val2 == 0) printf("Num%4d: ", Judge->val1);
 			printf(" %4d,", Judge->val1 * 10 + Judge->val2);
-			if(Judge->val2 == 4) printf("\n");
+			if(Judge->val2 == 10) printf("\n");
 		}
 	}
-	Free_AllLIST(ChainResult);
+	Free_AllLIST(ChainResult);	
 
+	end_time;
 }
