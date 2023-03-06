@@ -118,7 +118,7 @@ int main()
 			if(Judge->val2 == 10) printf("\n");
 		}
 	}
-	Free_AllLIST(ChainResult);	
+	Free_AllLIST(ChainResult);	//Create_NewLISTした階層で行う
 
 	end_time;
 }
