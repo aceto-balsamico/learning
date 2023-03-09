@@ -30,6 +30,13 @@ typedef struct _Node
 	int height;
 }NODE;
 
+typedef struct _box
+{
+	int data1;
+	int data2[1000];
+	int data3[1000];
+}DataBOX;
+
 
 #define begin_time double time_spent = 0.0;\
 clock_t begin = clock();
@@ -37,4 +44,8 @@ clock_t begin = clock();
 #define end_time clock_t end = clock();\
 time_spent += (double)(end - begin) / CLOCKS_PER_SEC;\
 printf("\n CPU Execution time is %f [ms]\n", time_spent * 1000);
+
+
+
+
 
