@@ -1,7 +1,3 @@
-// AVL tree implementation in C
-
-#include <stdio.h>
-#include <stdlib.h>
 #include "common.h"
 
 // Calculate height
