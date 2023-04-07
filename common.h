@@ -39,13 +39,18 @@ typedef struct _box
 	int data3[1000];
 }DataBOX;
 
+double time_spent, begin, end;
+void begin_time()
+{
+	clock_t begin = clock();
+}
+void end_time()
+{
+	clock_t end = clock();
+	time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+	printf("\n CPU Execution time is %f [ms]\n", time_spent * 1000);
+} 
 
-#define begin_time double time_spent = 0.0;\
-clock_t begin = clock();
-
-#define end_time clock_t end = clock();\
-time_spent += (double)(end - begin) / CLOCKS_PER_SEC;\
-printf("\n CPU Execution time is %f [ms]\n", time_spent * 1000);
 
 
 
