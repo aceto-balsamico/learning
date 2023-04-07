@@ -97,7 +97,7 @@ void Access_from0_to1000()
 
 int main()
 {
-	begin_time;
+	begin_time();
 
 	//リスト構造を利用して100までの数字で1から1000を表示する
 	LIST* ChainResult = Create_NewLIST();
@@ -120,5 +120,5 @@ int main()
 	}
 	Free_AllLIST(ChainResult);	//Create_NewLISTした階層で行う
 
-	end_time;
+	end_time();
 }

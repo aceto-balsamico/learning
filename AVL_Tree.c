@@ -219,7 +219,7 @@ void FreeAllTree(NODE* root)
 int main() 
 {	
 	//AVL Treeを利用して100までの数字で1〜1000を表示する
-	begin_time;
+	begin_time();
 
 	NODE* root = NULL;
 	for(int vartical = 0; vartical < 100; vartical++)
@@ -229,11 +229,11 @@ int main()
 			root = insertNode(root, vartical * 10 + horizontal);
 		}
 	}
-	// printInOrder(root);	//InOrderでノードを全表示
+	printInOrder(root);	//InOrderでノードを全表示
 	FreeAllTree(root);
-	end_time;
+	end_time();
 
-	// printf("\n Free Node Count:%d\n", g_free_count);	//freeしたノードの数
+	printf("\n Free Node Count:%d\n", g_free_count);	//freeしたノードの数
 
 	// root = deleteNode(root, 3);	//ノードを削除
 

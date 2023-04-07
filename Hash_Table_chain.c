@@ -136,6 +136,7 @@ void clear_table()
 
 int main() 
 {
+	begin_time();
 	for(char x = 0; x < 50; x++)
 	{
 		put(x, x + 50);
@@ -154,6 +155,8 @@ int main()
 
 	// printf("After removing key 'banana':\n");
 	print_table();
+	end_time();
+	
 	clear_table();
 
 	return 0;

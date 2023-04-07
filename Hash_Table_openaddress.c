@@ -183,7 +183,7 @@ int select_menu()
 
 int main()
 {
-	begin_time;
+	begin_time();
 
 	init_array(10000);
 	for(int num = 0; num < 1000; num++)
@@ -191,7 +191,7 @@ int main()
 		insert(num, num);
 	}
 
-	end_time;
+	end_time();
 
 	display(false);
 	printf("\nsize:%4d, empty:%4d, capacity:%4d\n", size, capacity-size, capacity);
