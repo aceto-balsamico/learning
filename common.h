@@ -40,15 +40,26 @@ typedef struct _box
 }DataBOX;
 
 double time_spent, begin, end;
-void begin_time()
+struct timespec ts1, ts2;
+void begin_time(int select_way)
 {
-	clock_t begin = clock();
+	if(select_way == 0)	begin = clock();
+	else if(select_way == 1)	clock_gettime(CLOCK_MONOTONIC, &ts1);
 }
-void end_time()
+//0=CLOCKS_PER_SEC(CPU Execution time), 1=CLOCK_MONOTONIC(elapsed time)
+void end_time(int select_way)
 {
-	clock_t end = clock();
-	time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
-	printf("\n CPU Execution time is %f [ms]\n", time_spent * 1000);
+	end = clock();
+	if(select_way == 0)
+	{
+		time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+		printf("\n CPU Execution time is %f [ms]\n", time_spent * 1000);
+	}
+	else if(select_way == 1)
+	{
+		clock_gettime(CLOCK_MONOTONIC, &ts2);
+		printf("\n elapsed time is %f [ms]\n", (ts2.tv_sec - ts1.tv_sec) * 1000.0 + (ts2.tv_nsec - ts1.tv_nsec) / 1000000.0);
+	}
 } 
 
 
