@@ -53,12 +53,13 @@ void end_time(int select_way)
 	if(select_way == 0)
 	{
 		time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
-		printf("\n CPU Execution time is %f [ms]\n", time_spent * 1000);
+		printf(" CPU Execution time is %f [ms]\n", time_spent * 1000);
 	}
 	else if(select_way == 1)
 	{
 		clock_gettime(CLOCK_MONOTONIC, &ts2);
-		printf("\n elapsed time is %f [ms]\n", (ts2.tv_sec - ts1.tv_sec) * 1000.0 + (ts2.tv_nsec - ts1.tv_nsec) / 1000000.0);
+		printf(" elapsed time is %f [ms]\n", (ts2.tv_sec - ts1.tv_sec) * 1000.0 + (ts2.tv_nsec - ts1.tv_nsec) / 1000000.0);	//milisec order
+		// printf(" elapsed time is %ld.%ld [s]\n", (ts2.tv_sec - ts1.tv_sec) , (ts2.tv_nsec - ts1.tv_nsec));	//sec order
 	}
 } 
 
