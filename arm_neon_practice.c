@@ -65,7 +65,7 @@ void count_ones_neon_partitioned(uint8_t* datax, uint8_t* datay, const int size,
 
 		for (int i = 0; i < vecSize; i++) 
 		{
-			__builtin_prefetch(&dataxPartition[i * 16], 0, 3);
+			__builtin_prefetch(&dataxPartition[i * 16], 0, 3);	//prefetch hint instruction,データポインタ、読み込み(0)、プリフェッチ強度
 			__builtin_prefetch(&datayPartition[i * 16], 0, 3);
 		}
 		//128bit neon registerにuint8_t型を16個ロードして処理。
@@ -159,6 +159,23 @@ uint32_t count_ones_neon_algorithm(const uint8_t* datax, const uint8_t* datay, c
 
 	return result;
 }
+uint32_t Simple_count_ones(uint8_t* datax, uint8_t* datay, int size)
+{
+	uint32_t result = 0;
+	for(int i = 0; i < size; i++)
+	{
+		int xor = datax[i] ^ datay[i];
+		for(int j = 0; j < 7; j++)
+		{
+			if((xor & 0x01) == 0x01)
+			{
+				result++;
+			}
+			xor >>= 1;
+		}
+	}
+	return result;
+}
 
 #define Num_Partition 16
 int main() 
@@ -173,6 +190,8 @@ int main()
 	uint8_t* array1;
 	uint8_t* array2;
 	uint32_t* array3;
+	uint8_t array4[100000];
+	uint8_t array5[100000];
 
 	posix_memalign((void**)&array1, alignment, arraySize * sizeof(uint8_t));
 	posix_memalign((void**)&array2, alignment, arraySize * sizeof(uint8_t));
@@ -186,6 +205,8 @@ int main()
 		array1[i] = 0x00;
 		array2[i] = 0x11;
 		array3[i] = 0x11;
+		array4[i] = 0x00;
+		array5[i] = 0x11;
 	}
 	for (int i = 0; i < Num_Partition; i++) 
 	{
@@ -193,12 +214,17 @@ int main()
 	}
 
 	int onesCount = 0;
-
 	begin_time(1);
 	for(int i = 0; i < arraySize; i++)
 	onesCount += __builtin_popcount(array3[i]);//0.013ms
 	end_time(1);
 	printf("\tbuiltin popcount:%d\n",onesCount);
+
+	begin_time(1);
+	for(int i = 0; i < arraySize; i++)
+	onesCount = Simple_count_ones(array4, array5, arraySize);//4221.597ms
+	end_time(1);
+	printf("\tSimple count:%d\n",onesCount);
 
 	begin_time(1);
 	onesCount = PopcntAlgorithm(array1, array2, arraySize);//0.041ms
