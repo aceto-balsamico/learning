@@ -1,9 +1,10 @@
 #include "common.h"
-
 #include <arm_neon.h>
+#pragma GCC optimize("O3")
+// #pragma GCC optimize("unroll-loops")
 
 /*
-	NEON（New Edge Of Normal）instruction set 命名規則
+	命名規則
 	v:ベクトル演算を表すプレフィックス
 	ld:ロード（Load）の略称
 	st:ストア（Store）の略称
@@ -42,11 +43,11 @@ uint32_t PopcntAlgorithm(uint8_t* datax, uint8_t* datay, size_t len)
 	return result;
 }
 
-void count_ones_neon_partitioned(uint8_t* datax, uint8_t* datay, int size, uint32_t* resultArray, int numPartitions) 
+void count_ones_neon_partitioned(uint8_t* datax, uint8_t* datay, const int size, uint32_t* resultArray, const int numPartitions) 
 {
-	int elementsPerPartition = size / numPartitions;
-	int vecSize = elementsPerPartition / 16;	//128bit neon register / uint8_t
-	int remainvecSize = elementsPerPartition % 16;	//partition中の16個同時ロードできない余りの数
+	const int elementsPerPartition = size / numPartitions;
+	const int vecSize = elementsPerPartition / 16;	//128bit neon register / uint8_t
+	const int remainvecSize = elementsPerPartition % 16;	//partition中の16個同時ロードできない余りの数
 
 	for (int p = 0; p < numPartitions; p++) 
 	{
@@ -62,6 +63,11 @@ void count_ones_neon_partitioned(uint8_t* datax, uint8_t* datay, int size, uint3
 		uint32x4_t resultVec16 = vdupq_n_u32(0);
 		uint32x2_t resultVec8 = vdup_n_u32(0);
 
+		for (int i = 0; i < vecSize; i++) 
+		{
+			__builtin_prefetch(&dataxPartition[i * 16], 0, 3);
+			__builtin_prefetch(&datayPartition[i * 16], 0, 3);
+		}
 		//128bit neon registerにuint8_t型を16個ロードして処理。
 		for (int i = 0; i < vecSize; i+=1)
 		{
@@ -112,15 +118,20 @@ void count_ones_neon_partitioned(uint8_t* datax, uint8_t* datay, int size, uint3
 		resultPartition[0] += vaddvq_u32(resultVec16);
 	}
 }
-uint32_t count_ones_neon_algorithm(const uint8_t* datax, const uint8_t* datay, int size) 
+uint32_t count_ones_neon_algorithm(const uint8_t* datax, const uint8_t* datay, const int size) 
 {
-	int vecSize = size / 16;
+	const int vecSize = size / 16;
 
 	uint8x16_t dataxVec, datayVec;
 	uint8x16_t data;
 	uint16x8_t tmpResult16;
 	uint32x4_t resultVec = vdupq_n_u32(0);
 
+	for (int i = 0; i < vecSize; i++) 
+	{
+		__builtin_prefetch(&datax[i * 16], 0, 3);
+		__builtin_prefetch(&datay[i * 16], 0, 3);
+	}
 	for (int i = 0; i < vecSize; i++) {
 		// 16個の要素をロード
 		dataxVec = vld1q_u8(datax);
