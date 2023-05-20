@@ -3,7 +3,7 @@
 #include <arm_neon.h>
 
 /*
-	命名規則
+	NEON（New Edge Of Normal）instruction set 命名規則
 	v:ベクトル演算を表すプレフィックス
 	ld:ロード（Load）の略称
 	st:ストア（Store）の略称
