@@ -181,7 +181,7 @@ uint32_t Simple_count_ones(uint8_t* datax, uint8_t* datay, int size)
 int main() 
 {
 	// 配列の要素数
-	int arraySize = 100000;	//numPartitionの倍数
+	uint32_t arraySize = 100000;	//numPartitionの倍数
 
 	// 配列のメモリアラインメント
 	const int alignment = 64;
@@ -192,12 +192,14 @@ int main()
 	uint32_t* array3;
 	uint8_t array4[100000];
 	uint8_t array5[100000];
-
-	posix_memalign((void**)&array1, alignment, arraySize * sizeof(uint8_t));
-	posix_memalign((void**)&array2, alignment, arraySize * sizeof(uint8_t));
-	posix_memalign((void**)&array3, alignment, arraySize * sizeof(uint32_t));
 	uint32_t* align32;
-	posix_memalign((void**)&align32, alignment, Num_Partition * sizeof(uint32_t));
+
+	int align_judge;
+
+	align_judge = posix_memalign((void**)&array1, alignment, arraySize * sizeof(uint8_t)); if(align_judge != 0) printf("Memory allocation failed.\n");
+	align_judge = posix_memalign((void**)&array2, alignment, arraySize * sizeof(uint8_t)); if(align_judge != 0) printf("Memory allocation failed.\n");
+	align_judge = posix_memalign((void**)&array3, alignment, arraySize * sizeof(uint32_t)); if(align_judge != 0) printf("Memory allocation failed.\n");
+	align_judge = posix_memalign((void**)&align32, alignment, Num_Partition * sizeof(uint32_t)); if(align_judge != 0) printf("Memory allocation failed.\n");
 
 	// 配列に値を設定
 	for (int i = 0; i < arraySize; i++) 
