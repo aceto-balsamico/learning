@@ -194,11 +194,13 @@ int main()
 	uint8_t array5[100000];
 	uint32_t* align32;
 
-	int align_judge;
-
+	int align_judge = 0;
 	align_judge = posix_memalign((void**)&array1, alignment, arraySize * sizeof(uint8_t)); if(align_judge != 0) printf("Memory allocation failed.\n");
+	align_judge = 0;
 	align_judge = posix_memalign((void**)&array2, alignment, arraySize * sizeof(uint8_t)); if(align_judge != 0) printf("Memory allocation failed.\n");
+	align_judge = 0;
 	align_judge = posix_memalign((void**)&array3, alignment, arraySize * sizeof(uint32_t)); if(align_judge != 0) printf("Memory allocation failed.\n");
+	align_judge = 0;
 	align_judge = posix_memalign((void**)&align32, alignment, Num_Partition * sizeof(uint32_t)); if(align_judge != 0) printf("Memory allocation failed.\n");
 
 	// 配列に値を設定
