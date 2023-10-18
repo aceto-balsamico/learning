@@ -118,22 +118,19 @@ void count_ones_neon_partitioned(uint8_t* datax, uint8_t* datay, const int size,
 		resultPartition[0] += vaddvq_u32(resultVec16);
 	}
 }
+#define REGISTERSIZE_ARMV7 128
 uint32_t count_ones_neon_algorithm(const uint8_t* datax, const uint8_t* datay, const int size) 
 {
-	const int vecSize = size / 16;
-
+	const int vecSize = size / (REGISTERSIZE_ARMV7 / __CHAR_BIT__);
 	uint8x16_t dataxVec, datayVec;
 	uint8x16_t data;
 	uint16x8_t tmpResult16;
 	uint32x4_t resultVec = vdupq_n_u32(0);
 
-	for (int i = 0; i < vecSize; i++) 
-	{
-		__builtin_prefetch(&datax[i * 16], 0, 3);
-		__builtin_prefetch(&datay[i * 16], 0, 3);
-	}
 	for (int i = 0; i < vecSize; i++) {
 		// 16個の要素をロード
+		// dataxVec = vld1q_u8(&datax[i * (REGISTERSIZE_ARMV7 / __CHAR_BIT__)]);
+		// datayVec = vld1q_u8(&datay[i * (REGISTERSIZE_ARMV7 / __CHAR_BIT__)]);
 		dataxVec = vld1q_u8(datax);
 		datayVec = vld1q_u8(datay);
 
@@ -145,17 +142,21 @@ uint32_t count_ones_neon_algorithm(const uint8_t* datax, const uint8_t* datay, c
 		data = vaddq_u8(vandq_u8(data, vdupq_n_u8(0x33)), vshrq_n_u8(vandq_u8(data, vdupq_n_u8(0xCC)), 2));
 		data = vaddq_u8(vandq_u8(data, vdupq_n_u8(0x0F)), vshrq_n_u8(vandq_u8(data, vdupq_n_u8(0xF0)), 4));
 
-		tmpResult16 = vpaddlq_u8(data);
-
 		// 結果を32ビット整数ベクトルに加算
-		resultVec = vpadalq_u16(resultVec, tmpResult16);
+		resultVec = vpadalq_u16(resultVec, vpaddlq_u8(data));
 
-		datax += 16;
+		datax += 16;//16byte移動
 		datay += 16;
 	}
 
 	// 32ビット整数ベクトルの要素を水平方向に加算
 	uint32_t result = vaddvq_u32(resultVec);
+
+	//neonで処理できなかったあまりを計算
+	for(int i = 0; i < size % (REGISTERSIZE_ARMV7 / __CHAR_BIT__); i++)
+	{
+		result += __builtin_popcount(datax[i] ^ datay[i]);
+	}
 
 	return result;
 }
