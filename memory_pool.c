@@ -68,6 +68,32 @@ void deallocateMultipleMemory(MemoryBlock* blocks, int numBlocks)
         deallocateMemory(&blocks[i]);
     }
 }
+void deallocateAndShiftMemory(int numBlocksToDeallocate) 
+{
+    if (numBlocksToDeallocate >= pool.count) 
+	{
+        printf("解放するメモリブロックの数が残りのメモリブロック数を超えています。\n");
+        return;
+    }
+
+    // 解放するメモリブロックの数だけ前半を解放
+    pool.count += numBlocksToDeallocate;
+
+    // 解放された後のメモリブロックを解放されたブロックの位置に移動
+    for (int i = pool.size - 1; i >= pool.size - pool.count; i--) 
+	{
+        pool.blocks[i] = pool.blocks[i - numBlocksToDeallocate];
+    }
+}
+void printUsedData1() 
+{
+    printf("\n使用中のメモリブロックの data1:");
+    for (int i = pool.count; i < pool.size; i++) 
+	{
+        printf("[%p]%d ", &pool.blocks[i].data1, pool.blocks[i].data1);
+    }
+    printf("\n");
+}
 void deallocateAllMemory() 
 {
     for (int i = pool.count; i < pool.size; i++) 
@@ -106,6 +132,14 @@ int main()
 			printf("%02X,", block2->array[i]);
 		}
     }
+	MemoryBlock* block_A = allocateMemory(999, 1.2, 65);
+	MemoryBlock* block_B = allocateMemory(888, 1.2, 65);
+	MemoryBlock* block_C = allocateMemory(777, 1.2, 65);
+	MemoryBlock* block_D = allocateMemory(666, 1.2, 65);
+	MemoryBlock* block_E = allocateMemory(555, 1.2, 65);
+	printUsedData1();
+	deallocateAndShiftMemory(3);
+	printUsedData1();
 
 
     printf("残りのメモリブロック数: %d\n", getRemainingCount());
