@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct 
 {
     int data1;
     float data2;
     char data3;
+	unsigned char array[10000];
 } MemoryBlock;
 
 typedef struct 
@@ -62,19 +64,36 @@ int getRemainingCount()
 
 int main() 
 {
-    initializeMemoryPool(5);
+    initializeMemoryPool(10000);
 
     MemoryBlock* block1 = allocateMemory(42, 3.14f, 'A');
+	for(int i = 0; i < 10000; i++)
+	{
+		block1->array[i] = i;
+	}
     if (block1 != NULL) 
 	{
         printf("メモリブロック取得: %d, %f, %c\n", block1->data1, block1->data2, block1->data3);
     }
+	for(int i = 0; i < 10000; i++)
+	{
+		printf("%d,", block1->array[i]);
+	}
 
     MemoryBlock* block2 = allocateMemory(99, 2.718f, 'B');
     if (block2 != NULL) 
 	{
         printf("メモリブロック取得: %d, %f, %c\n", block2->data1, block2->data2, block2->data3);
     }
+	for(int i = 0; i < 10000; i++)
+	{
+		memset(block2->array, 0xFF, 10000);
+	}
+	for(int i = 0; i < 10000; i++)
+	{
+		printf("%02X,", block2->array[i]);
+	}
+
 
     printf("残りのメモリブロック数: %d\n", getRemainingCount());
 
