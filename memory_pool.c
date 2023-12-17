@@ -61,7 +61,21 @@ int getRemainingCount()
 {
     return pool.count;
 }
-
+void deallocateMultipleMemory(MemoryBlock* blocks, int numBlocks) 
+{
+    for (int i = 0; i < numBlocks; i++) 
+	{
+        deallocateMemory(&blocks[i]);
+    }
+}
+void deallocateAllMemory() 
+{
+    for (int i = pool.count; i < pool.size; i++) 
+	{
+        deallocateMemory(&pool.blocks[i]);
+    }
+    pool.count = pool.size;
+}
 int main() 
 {
     initializeMemoryPool(10000);
@@ -96,8 +110,12 @@ int main()
 
     printf("残りのメモリブロック数: %d\n", getRemainingCount());
 
-    deallocateMemory(block1);
-    deallocateMemory(block2);
+    // deallocateMemory(block1);
+    // deallocateMemory(block2);
+	MemoryBlock blocksToDeallocate[] = {*block1, *block2};
+    deallocateMultipleMemory(blocksToDeallocate, sizeof(blocksToDeallocate) / sizeof(MemoryBlock));
+	// deallocateAllMemory();
+	
 
     printf("残りのメモリブロック数: %d\n", getRemainingCount());
 
