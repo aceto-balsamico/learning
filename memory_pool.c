@@ -74,25 +74,24 @@ int main()
     if (block1 != NULL) 
 	{
         printf("メモリブロック取得: %d, %f, %c\n", block1->data1, block1->data2, block1->data3);
+		for(int i = 0; i < 10000; i++)
+		{
+			printf("%d,", block1->array[i]);
+		}
     }
-	for(int i = 0; i < 10000; i++)
-	{
-		printf("%d,", block1->array[i]);
-	}
 
     MemoryBlock* block2 = allocateMemory(99, 2.718f, 'B');
+
+	memset(block2->array, 0xFF, 10000);
+	
     if (block2 != NULL) 
 	{
         printf("メモリブロック取得: %d, %f, %c\n", block2->data1, block2->data2, block2->data3);
+		for(int i = 0; i < 10000; i++)
+		{
+			printf("%02X,", block2->array[i]);
+		}
     }
-	for(int i = 0; i < 10000; i++)
-	{
-		memset(block2->array, 0xFF, 10000);
-	}
-	for(int i = 0; i < 10000; i++)
-	{
-		printf("%02X,", block2->array[i]);
-	}
 
 
     printf("残りのメモリブロック数: %d\n", getRemainingCount());
