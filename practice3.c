@@ -12,9 +12,9 @@ typedef struct _Node
 }Node;
 
 // リストを作成する関数
-Node *makelist() 
+Node* makelist() 
 {
-	Node *list = malloc(sizeof(Node));
+	Node* list = malloc(sizeof(Node));
 	if (list == NULL) 
 	{
 		fprintf(stderr, "Memory allocation failed.\n");
@@ -30,60 +30,60 @@ Node *makelist()
 }
 
 // リストにノードを追加する関数
-void appendlist(Node *list, int value) 
+void appendlist(Node* list, int value) 
 {
 	// 新しいノードを作成
-	Node *new_node;
+	Node* new_node;
 
 	if (list->top == NULL) 
 	{
 		// リストが空の場合、makelistで作成したノードを使用
-		list->value = value;
-		list->top = list;
-		(*(list->end))->next = list; // 現在の末尾ノードのnextを新しいノードに設定
-		*(list->end) = list; // リスト全体の末尾を更新
+		list->value 			= value;
+		list->top 				= list;
+		(*(list->end))->next 	= list; // 現在の末尾ノードのnextを新しいノードに設定
+		*(list->end) 			= list; // リスト全体の末尾を更新
 
 		// デバッグ出力
 		printf("Node Value: %d,", list->value);
-		printf("Top: %p, \n", (void *)list->top);
+		printf("Top: %p, ", list->top);
+		printf("                   Node   : %p, \n", list);
 
 	} 
 	else 
 	{
 		// 新しいノードを作成
-		// printf("top is not null\n");
-		new_node = malloc(sizeof(Node));
+		new_node = (Node*)malloc(sizeof(Node));
 		if (new_node == NULL) 
 		{
 			fprintf(stderr, "Memory allocation failed.\n");
 			exit(EXIT_FAILURE);
 		}
 		
-		new_node->value = value;
-		new_node->top = list->top;
-		new_node->next = NULL;
-		new_node->prev = *(list->end); // 現在の末尾ノードを前のノードとして設定
-		new_node->end = list->end;
+		new_node->value 	= value;
+		new_node->top 		= list->top;
+		new_node->next 		= NULL;
+		new_node->prev 		= *(list->end); // 現在の末尾ノードを前のノードとして設定
+		new_node->end 		= list->end;
 
-		(*(list->end))->next = new_node; // 現在の末尾ノードのnextを新しいノードに設定
-		*(list->end) = new_node; // リスト全体の末尾を更新
+		(*(list->end))->next 	= new_node; // 現在の末尾ノードのnextを新しいノードに設定
+		*(list->end) 			= new_node; // リスト全体の末尾を更新
 
 		// デバッグ出力
 		printf("Node Value: %d,", new_node->value);
-		printf("Top: %p, ", (void *)new_node->top);
-		printf("Prev: %p, ", (void *)new_node->prev);
-		printf("NodeAdd: %p, ", (void *)new_node);
-		printf("Next: %p, ", (void *)new_node->next);
-		printf("End: %p\n", (void *)*(new_node->end));
+		printf("Top: %p, ", new_node->top);
+		printf("Prev: %p, ", new_node->prev);
+		printf("NodeAdd: %p, ", new_node);
+		printf("Next: %p, ", new_node->next);
+		printf("End: %p\n", *(new_node->end));
 	}
 
 }
 
 // リストを解放する関数
-void freelist(Node *list) 
+void freelist(Node* list) 
 {
-	Node *current = list;
-	Node *next;
+	Node* current = list;
+	Node* next;
 
 	while (current != NULL) 
 	{
@@ -102,7 +102,7 @@ int main()
 		appendlist(my_list, i); // リストにノードを追加
 	}
 	printf("List values:\n");
-	Node *current = my_list;
+	Node* current = my_list;
 	while (current != NULL) 
 	{
 		printf("value:%d, prev:%12p, address:%12p, next:%12p, end:%12p, top:%12p\n", 
