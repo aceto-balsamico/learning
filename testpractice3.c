@@ -5,6 +5,7 @@ typedef struct Node {
     int value;
 	int array_size;
 	unsigned char* array;
+
     struct Node *prev;
     struct Node *next;
 } Node;
@@ -127,27 +128,62 @@ void freelist(List *list) {
     }
     free(list);
 }
+void freeTop90Percent(List* list) 
+{
+    if (list == NULL || list->size == 0) 
+	{
+        return;
+    }
 
+    int targetSize = list->size * 0.9; // 上位90%のノード数
+    Node* current = list->head;
+
+    // 上位90%のノードまでループ
+    for (int i = 0; i < targetSize && current != NULL; i++) 
+	{
+        Node* next = current->next;
+		if (current->array != NULL) 
+		{
+            free(current->array);  // arrayがNULLでない場合、メモリを解放
+        }
+        free(current);
+        current = next;
+    }
+
+    // リストのヘッドとサイズを更新
+    list->head = current;
+    if (current != NULL) 
+	{
+        current->prev = NULL;
+    }
+	else 
+	{
+        list->tail = NULL;
+    }
+    list->size = list->size - targetSize;
+}
 int main() {
     List *my_list = makelist(); // 空のリストを作成
 
-    for (int i = 0; i < 5; i++) {
-        appendlist(my_list, i); // リストにノードを追加
+    appendlist(my_list, 100); // リストにノードを追加
+	unsigned char array_data[10] = {1, 2, 3, 4, 5, 6, 7, 8 ,9 ,10};
+    for (int i = 0; i < 20; i++) {
+		appendlist_witharray(my_list, i, array_data, sizeof array_data/sizeof array_data[0]);
     }
 
-    display_list(my_list); // リストの内容を表示
+    // display_list(my_list); // リストの内容を表示
 
     Node *end_node = get_end_node(my_list);
     if (end_node != NULL) {
         printf("NodeSize:%d, End Node Value: %d (%p)\n", my_list->size, end_node->value, end_node);
     }
 
-	appendlist(my_list, 100); // リストにノードを追加
+	appendlist(my_list, 200); // リストにノードを追加
 	display_list(my_list); // リストの内容を表示
 	printf("NodeSize:%d, End Node Value: %d (%p)\n", my_list->size, get_end_node(my_list)->value, get_end_node(my_list));
 
-	unsigned char array_data[10] = {1, 2, 3, 4, 5, 6, 7, 8 ,9 ,10};
-	appendlist_witharray(my_list, 200, array_data, 10);
+	display_list(my_list);
+	freeTop90Percent(my_list);
 	display_list(my_list);
 
     freelist(my_list); // リスト全体を解放
