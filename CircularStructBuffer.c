@@ -28,6 +28,8 @@ MemoryPool* init_memory_pool(int size) {
     }
 	mp->top_index = 0;
 	mp->end_index = 0;
+
+	// printf("Pool size: %d (%zu Byte)\n", size, size * sizeof(MyStruct));
     return mp;
 }
 
@@ -100,28 +102,41 @@ void read_allstruct(MemoryPool *mp) {
 	
 }
 // メイン関数
+#include "common.h"
 int main() {
-    MemoryPool *mp = init_memory_pool(128);//2のべき乗にする
-	print_memory_pool(mp);
+	// print_memory_pool(mp);
 
     // 構造体を挿入
-    for (int i = 0; i < 120; i++) {
-        insert_struct(mp, i);
-    }
+    // for (int i = 0; i < 120; i++) {
+    //     insert_struct(mp, i);
+    // }
 
     // メモリプールの状態を出力
-    print_memory_pool(mp);
-
-	for (int i = 120; i < 181; i++) {
-        insert_struct(mp, i);
-    }
-	print_memory_pool(mp);
+    // print_memory_pool(mp);
+	double ave = 0.0;
+	int test_count = 100;	//100回繰り返して平均を出す
+	int test_struct_count = 100000000;//1億個の構造体を挿入する
+	for(int size = 2; size < 1024; size*=2)
+	{
+		ave = 0.0;
+		for(int i = 0; i < test_count; i++)
+		{
+			MemoryPool *mp = init_memory_pool(size*1024*1024);//2のべき乗にする.32M個の構造体.多くしすぎると他の関数のメモリを圧迫するためむしろ時間がかかるようになる。
+			begin_time(1);
+			for (int i = 0; i < test_struct_count; i++) {
+				insert_struct(mp, i);
+			}
+			ave += end_time_return();
+			free_memory_pool(mp);
+		}
+		printf("size:%d, ave:%f ms\n", size, ave/test_count);
+	}
+	// print_memory_pool(mp);
 	
-	read_allstruct(mp);
-	print_memory_pool(mp);
+	// read_allstruct(mp);
+	// print_memory_pool(mp);
 
     // メモリプールの解放
-    free_memory_pool(mp);
 
     return 0;
 }
