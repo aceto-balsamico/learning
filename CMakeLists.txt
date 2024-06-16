@@ -1,12 +1,31 @@
 cmake_minimum_required(VERSION 3.10)
 project(SimpleBuildExample)
 
+# クロスコンパイル用のツールチェインを指定
+set(CMAKE_SYSTEM_NAME Linux)
+set(CMAKE_SYSTEM_PROCESSOR arm)
+
+# クロスコンパイル用のコンパイラを指定
+set(CMAKE_C_COMPILER arm-none-eabi-gcc)
+set(CMAKE_CXX_COMPILER arm-none-eabi-g++)
+
 # ソースディレクトリの設定
 set(SRC_DIR "${CMAKE_SOURCE_DIR}/src")
 set(ANALYSIS_DIR "${CMAKE_SOURCE_DIR}/analysis")
 set(SYS_DIR "${CMAKE_SOURCE_DIR}/sys")
 set(BIN_DIR "${CMAKE_BINARY_DIR}/bin")
 set(OBJ_DIR "${CMAKE_BINARY_DIR}/obj")
+
+# main.cからバージョン情報を取得
+file(READ "${ANALYSIS_DIR}/main.c" MAIN_C_CONTENTS)
+string(REGEX MATCH "Rev\\.([0-9a-zA-Z]+)" VERSION_MATCH ${MAIN_C_CONTENTS})
+
+if(VERSION_MATCH)
+    set(VERSION_STRING ${CMAKE_MATCH_1})
+    set(EXECUTABLE_NAME "Analysis_Rev${VERSION_STRING}")
+else()
+    message(FATAL_ERROR "Version string 'Rev.**' not found in ${ANALYSIS_DIR}/main.c")
+endif()
 
 # ビルドディレクトリの作成
 file(MAKE_DIRECTORY ${BIN_DIR})
@@ -68,14 +87,14 @@ endif()
 set(CMAKE_BUILD_FLAGS "-j${N}")
 
 # 実行ファイルの作成
-add_executable(my_executable "")
-set_target_properties(my_executable PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BIN_DIR})
+add_executable(${EXECUTABLE_NAME} "")
+set_target_properties(${EXECUTABLE_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BIN_DIR})
 
 # ビルドターゲットの設定
 if(DEFINED ENV{sys})
     set(SYS_TARGET $ENV{sys})
-    target_sources(my_executable PRIVATE ${ANALYSIS_C_FILES} ${ANALYSIS_CPP_FILES} ${SYS_DIR}/${SYS_TARGET})
+    target_sources(${EXECUTABLE_NAME} PRIVATE ${ANALYSIS_C_FILES} ${ANALYSIS_CPP_FILES} ${SYS_DIR}/${SYS_TARGET})
 else()
-    target_sources(my_executable PRIVATE ${ANALYSIS_C_FILES} ${ANALYSIS_CPP_FILES})
+    target_sources(${EXECUTABLE_NAME} PRIVATE ${ANALYSIS_C_FILES} ${ANALYSIS_CPP_FILES})
 endif()
-target_link_libraries(my_executable src_lib)
+target_link_libraries(${EXECUTABLE_NAME} src_lib)
