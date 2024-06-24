@@ -98,6 +98,20 @@ char* getData1byName(const char* name) {
 	}
 	return NULL;
 }
+
+
+// ハッシュテーブルのメモリを解放
+void freeHashTable() {
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        Record *current = hashTable[i];
+        while (current != NULL) {
+            Record *temp = current;
+            current = current->next;
+            free(temp);
+        }
+        hashTable[i] = NULL;
+    }
+}
 int main() {
 	// ハッシュテーブルの初期化
 	for (int i = 0; i < TABLE_SIZE; i++) {
@@ -124,6 +138,10 @@ int main() {
 
 	// ハッシュテーブルの内容を出力する
 	printHashTable();
+
+	// ハッシュテーブルのメモリを解放
+	freeHashTable();
+	// printHashTable();
 
 	return 0;
 }
