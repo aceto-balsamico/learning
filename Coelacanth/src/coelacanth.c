@@ -21,12 +21,12 @@ void displayQueue(int *queue, int queueSize, int previousQueueSize) {
 	printf("\033[0J"); // カーソルから右下までクリア
 
 	// printf("\033[2K");
-	printf("\033[F");// カーソルを一行上に移動
-	printf(" |\n");
+	// printf("\033[F");// カーソルを一行上に移動
+	// printf(" |\n");
 
 	for (int i = 0; i < queueSize; i++) {
 		if(i != queueSize-1)	printf(" | %s\n", g_FunctionsPtr[queue[i]-1].name);
-		else				printf(" v %s\n", g_FunctionsPtr[queue[i]-1].name);
+		else					printf(" v %s\n", g_FunctionsPtr[queue[i]-1].name);
 
 	}
 
@@ -69,6 +69,7 @@ int main()
 	while(1)
 	{
 		printf("\n-> ");	
+		
 		char input[100] = {};
 		
 		fgets(input, sizeof(input), stdin);

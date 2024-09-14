@@ -3,6 +3,7 @@
 
 create_include()
 {
+
 # ライブラリのソースコードがあるディレクトリ
 LIBCDIR="libc"
 
@@ -19,21 +20,24 @@ echo "#include <stdio.h>" >> "$HEADER_FILE"
 echo "" >> "$HEADER_FILE"
 
 # ライブラリのソースコードを処理してヘッダーファイルに関数のプロトタイプを追加
-for source_file in "$LIBCDIR"/*.c; do
+trimmed_strings=()
+while read -r source_file; do
     marker_found=false
     while IFS= read -r line; do
         if [[ $marker_found == true && $line =~ [^[:space:]] ]]; then
-            function_name=$(echo "$line" | sed -E 's/([^()]*)\(.*$/\1/') #(が登場するまでの文字列にマッチする
+            # '('が登場するまでの文字列にマッチする
+            function_name=$(echo "$line" | sed -E 's/([^()]*)\(.*$/\1/') 
             echo "$function_name();" >> "$HEADER_FILE"
             marker_found=false
 
-			trimmed_string=$(echo "$function_name" | sed 's/^[^ ]* //')
-			trimmed_strings+=("$trimmed_string")
+            # 関数名から最初の単語（型など）を除去し、配列に追加
+            trimmed_string=$(echo "$function_name" | sed 's/^[^ ]* //')
+            trimmed_strings+=("$trimmed_string")
         elif [[ $line == *"$MARKER"* ]]; then
             marker_found=true
         fi
     done < "$source_file"
-done
+done < <(find "$LIBCDIR" -type f -name "*.c")
 
 # 関数ポインタ構造体の定義
 echo "" >> "$HEADER_FILE"
@@ -56,10 +60,10 @@ echo "int g_numFunctionsPtr = sizeof(g_FunctionsPtr) / sizeof(g_FunctionsPtr[0])
 
 if [ "$1" == "comp" ]; then
 	# make comp を実行
-	make comp
+	make comp -f makefile.mk
 elif [ "$1" == "link" ]; then
 	# make link を実行
-	make link
+	make link -f makefile.mk
 else
 	# デフォルトの場合はすべてのコマンドを順に実行
 	make comp -f makefile.mk

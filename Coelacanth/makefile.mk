@@ -8,12 +8,12 @@ LIB_DIR := $(OBJ_DIR)/lib
 
 # コンパイラとフラグ
 CC := gcc
-CFLAGS := -Wall -O3 -march=native -mtune=native
+CFLAGS := -Wall -O3 -march=native -mtune=native -MMD -MP
 LDFLAGS := -L$(LIB_DIR) #-Wl,-rpath=$(LIB_DIR)
 
-# ソースファイルとオブジェクトファイルの取得
+# ソースファイルとオブジェクトファイルの取得。LIBC_DIRにある.cファイルは再帰的に取得
 SRC_FILES := $(wildcard $(SRC_DIR)/*.c)
-LIBC_FILES := $(wildcard $(LIBC_DIR)/*.c)
+LIBC_FILES := $(shell find $(LIBC_DIR) -type f -name "*.c")
 OBJ_FILES := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC_FILES))
 
 # 共有ライブラリの生成
@@ -45,3 +45,5 @@ $(LIB_DIR) $(OBJ_DIR) $(BIN_DIR):
 
 clean:
 	rm -rf $(OBJ_DIR) $(BIN_DIR) $(LIB_DIR)
+
+-include $(OBJ_FILES:.o=.d)
