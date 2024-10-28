@@ -72,22 +72,88 @@ create_include()
     echo "int g_numFunctionsPtr = sizeof(g_FunctionsPtr) / sizeof(g_FunctionsPtr[0]);" >> "$HEADER_FILE"
 }
 
-build_project() 
-{
-	# 引数に1があったら最適化オプションを付けてコンパイル。ついてなかったらデバッグフラグを付ける。
-    if [[ $1 == "1" ]]; then
-        compile_options="-O3"
-    else
-        compile_options="-g -Wall"
-    fi
+# RAMディスクの設定
+RAMDISK_SIZE=1G
+RAMDISK_MOUNT_POINT="/mnt/ramdisk"
 
-    time make SHELL_ARG="$compile_options"
+# RAMディスクの作成
+setup_ramdisk() 
+{
+	# sudo mount -t tmpfs -o size=1G,mode=1777 tmpfs "$HOME/ramdisk"
+	sudo mount -t tmpfs -o size=1G,mode=1777 tmpfs "$RAMDISK_MOUNT_POINT"
+	echo "RAMDISK: $RAMDISK_MOUNT_POINT"
 }
 
+num_jobs=$(cat /proc/cpuinfo | grep processor /proc/cpuinfo | wc -l)
+# RAMディスク上のディレクトリ作成関数
+setup_ramdisk_dirs() {
+    export OBJDIR="$RAMDISK_MOUNT_POINT/obj"
+    export BINDIR="$RAMDISK_MOUNT_POINT/bin"
+    
+    # RAMディスク上に必要なディレクトリの作成
+    sudo mkdir -p "$OBJDIR"
+    sudo mkdir -p "$BINDIR"
+    sudo mkdir -p "$OBJDIR/src" "$OBJDIR/analysis"
+    
+    # srcとanalysisディレクトリ内のサブディレクトリも作成
+    find src -type d -exec sudo mkdir -p "$OBJDIR"/{} \;
+    find analysis -type d -exec sudo mkdir -p "$OBJDIR"/{} \;
+
+	sudo chown $USER:$USER $HOME/ramdisk
+	chmod 777 $HOME/ramdisk
+}
+
+# ビルド関数
+build_project() {
+    # 初期設定（デフォルト：デバッグオプション）
+    compile_options="-g -Wall"
+    ramdisk_mode=false
+    
+    # 引数に応じたオプション設定
+    for arg in "$@"; do
+        case $arg in
+            -op)
+                compile_options="-O3"
+                ;;
+            -ram)
+                ramdisk_mode=true
+                ;;
+        esac
+    done
+
+    if $ramdisk_mode; then
+        # RAMディスク上でのビルド
+        echo "ファストビルドを開始します (RAMディスク使用)"
+		setup_ramdisk
+        setup_ramdisk_dirs
+        time make SHELL_ARG="$compile_options"  OBJDIR="$OBJDIR" BINDIR="$BINDIR"
+        echo "Logical Proc=$num_jobs"
+
+        # RAMディスクからローカルのobjとbinディレクトリへコピー
+        echo "ビルドが完了しました。出力ファイルを保存先へ移動します..."
+        cp -r "$OBJDIR/"* obj/
+        cp -r "$BINDIR/"* bin/
+        
+        # RAMディスクのアンマウント
+        echo "RAMディスクをアンマウントします..."
+        sudo umount "$RAMDISK_MOUNT_POINT"
+    else
+        # 通常ビルド
+        echo "通常ビルドを開始します..."
+        time make SHELL_ARG="$compile_options" 
+        echo "Logical Proc=$num_jobs"
+    fi
+}
 # 戻り値よりmakeの結果を確認
 return_value=1
+# create_include
+# setup_ramdisk
+# build_project "$1"
+
 create_include
-build_project "$1"
+
+build_project "$@"
+
 return_value=$?
 
 if [ $return_value -eq 0 ]; then

@@ -1,5 +1,5 @@
 ## How to Use
-**T**
+**T Horisawa**
 MarkDown用VSCode拡張機能
 ・MarkDown All in One
 ・Markdown Preview Enhanced
@@ -23,7 +23,7 @@ MarkDown用VSCode拡張機能
 
    ], 
   edge: [
-    'I+J 5 ms DATA',
+    'I+J 5 ms tDATA',
     'K<->L 5 ms',
   	'Z=S', 'Y=T'
   ],
