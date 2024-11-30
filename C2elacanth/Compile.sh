@@ -146,14 +146,8 @@ build_project() {
 }
 # 戻り値よりmakeの結果を確認
 return_value=1
-# create_include
-# setup_ramdisk
-# build_project "$1"
-
 create_include
-
 build_project "$@"
-
 return_value=$?
 
 if [ $return_value -eq 0 ]; then
