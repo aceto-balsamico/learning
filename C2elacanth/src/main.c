@@ -3,7 +3,7 @@
 
 int main(int argc, char* argv[])
 {
-	src_func();
+	// src_func();
 	userfunc(argc, argv);
 
 	return 0;

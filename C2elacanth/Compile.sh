@@ -3,18 +3,16 @@
 create_include()
 {
     # ライブラリのソースコードがあるディレクトリ
-    LIBCDIR="analysis_library"
+    LIBCDIR="dev_program"
 
     # ヘッダーファイル
-    HEADER_FILE="analysis/library_functions.h"
+    HEADER_FILE="body/library_functions.h"
 
     # メニューに追加する関数のマーカー
     MARKER="@@@function"
 
     # ヘッダーファイルのヘッダー
     echo "// Automatically generated header file" > "$HEADER_FILE"
-    echo "" >> "$HEADER_FILE"
-    echo "#include <stdio.h>" >> "$HEADER_FILE"
     echo "" >> "$HEADER_FILE"
 
     # 関数のプロトタイプを追加
@@ -47,14 +45,14 @@ create_include()
                 marker_found=true
             fi
         done < "$source_file"
-    done < <(find "$LIBCDIR" -type f -name "*.c")
+    done < <(find "$LIBCDIR" -type f -name "*.c" | sort)
 
     # 構造体の定義
     echo "" >> "$HEADER_FILE"
     echo "typedef struct" >> "$HEADER_FILE"
     echo "{" >> "$HEADER_FILE"
-    echo "    const char *name;" >> "$HEADER_FILE"
     echo "    void* func;" >> "$HEADER_FILE"
+    echo "    const char *func_name;" >> "$HEADER_FILE"
     echo "    const char *subdir_name;" >> "$HEADER_FILE"
     echo "} s_FunctionPtr;" >> "$HEADER_FILE"
     echo "" >> "$HEADER_FILE"
@@ -65,7 +63,7 @@ create_include()
     for entry in "${trimmed_strings[@]}"; do
         func_name=$(echo "$entry" | cut -d' ' -f1)
         func_subdir=$(echo "$entry" | cut -d' ' -f2)
-        echo "    {\"$func_name\", (void*)$func_name, \"$func_subdir\"}," >> "$HEADER_FILE"
+        echo "    {(void*)$func_name, \"$func_name\", \"$func_subdir\"}," >> "$HEADER_FILE"
     done
     echo "};" >> "$HEADER_FILE"
     echo "" >> "$HEADER_FILE"
@@ -84,7 +82,7 @@ setup_ramdisk()
 	echo "RAMDISK: $RAMDISK_MOUNT_POINT"
 }
 
-num_jobs=$(cat /proc/cpuinfo | grep processor /proc/cpuinfo | wc -l)
+num_jobs=$(sysctl -n hw.logicalcpu)
 # RAMディスク上のディレクトリ作成関数
 setup_ramdisk_dirs() {
     export OBJDIR="$RAMDISK_MOUNT_POINT/obj"
@@ -93,11 +91,11 @@ setup_ramdisk_dirs() {
     # RAMディスク上に必要なディレクトリの作成
     sudo mkdir -p "$OBJDIR"
     sudo mkdir -p "$BINDIR"
-    sudo mkdir -p "$OBJDIR/src" "$OBJDIR/analysis"
+    sudo mkdir -p "$OBJDIR/src" "$OBJDIR/body"
     
-    # srcとanalysisディレクトリ内のサブディレクトリも作成
+    # srcとbodyディレクトリ内のサブディレクトリも作成
     find src -type d -exec sudo mkdir -p "$OBJDIR"/{} \;
-    find analysis -type d -exec sudo mkdir -p "$OBJDIR"/{} \;
+    find body -type d -exec sudo mkdir -p "$OBJDIR"/{} \;
 
 	sudo chown $USER:$USER $HOME/ramdisk
 	chmod 777 $HOME/ramdisk
@@ -121,13 +119,15 @@ build_project() {
         esac
     done
 
+	rm obj/body/menu.o
+
     if $ramdisk_mode; then
         # RAMディスク上でのビルド
         echo "ファストビルドを開始します (RAMディスク使用)"
 		setup_ramdisk
         setup_ramdisk_dirs
-        time make SHELL_ARG="$compile_options"  OBJDIR="$OBJDIR" BINDIR="$BINDIR"
         echo "Logical Proc=$num_jobs"
+        time make SHELL_ARG="$compile_options"  OBJDIR="$OBJDIR" BINDIR="$BINDIR" -j"$num_jobs"
 
         # RAMディスクからローカルのobjとbinディレクトリへコピー
         echo "ビルドが完了しました。出力ファイルを保存先へ移動します..."
@@ -140,8 +140,8 @@ build_project() {
     else
         # 通常ビルド
         echo "通常ビルドを開始します..."
-        time make SHELL_ARG="$compile_options" 
         echo "Logical Proc=$num_jobs"
+        time make SHELL_ARG="$compile_options" -j"$num_jobs"
     fi
 }
 # 戻り値よりmakeの結果を確認

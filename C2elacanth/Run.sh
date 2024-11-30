@@ -2,4 +2,4 @@
 
 make lib -s
 
-bin/main_executable
+bin/main_executable "$@"

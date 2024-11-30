@@ -1,7 +1,7 @@
 # コンパイラとオプション
 CC = gcc
 SHELL_ARG =
-INCLUDE = -I$(SRCDIR) -I$(ANALYSISDIR)
+INCLUDE = -I$(SRCDIR) -I$(bodyDIR)
 CFLAGS = $(SHELL_ARG) -MMD -MP $(INCLUDE)
 CFLAGS_SO = $(CFLAGS) -fPIC
 LDFLAGS_SO = -shared
@@ -10,23 +10,23 @@ LDFLAGS_SO = -shared
 OBJDIR = obj
 BINDIR = bin
 SRCDIR = src
-ANALYSISDIR = analysis
-LIBDIR = analysis_library
-LIBOBJDIR = $(OBJDIR)/analysis_library
+bodyDIR = body
+LIBDIR = dev_program
+LIBOBJDIR = $(OBJDIR)/dev_program
 STATIC_LIB = $(OBJDIR)/libsrc.a
 
 # 必要なディレクトリの作成
-DIRS = $(OBJDIR)/src $(OBJDIR)/analysis $(BINDIR)
+DIRS = $(OBJDIR)/src $(OBJDIR)/body $(BINDIR)
 $(shell mkdir -p $(DIRS))
 
 # 各ディレクトリ内の.cファイルをリスト化
 SRC_C_FILES = $(wildcard $(SRCDIR)/*.c)
-ANALYSIS_C_FILES = $(wildcard $(ANALYSISDIR)/*.c)
+body_C_FILES = $(wildcard $(bodyDIR)/*.c)
 LIB_C_FILES = $(shell find $(LIBDIR) -name "*.c")
 
 # オブジェクトファイルと共有ライブラリの出力ファイル指定
 SRC_OBJS = $(SRC_C_FILES:$(SRCDIR)/%.c=$(OBJDIR)/src/%.o)
-ANALYSIS_OBJS = $(ANALYSIS_C_FILES:$(ANALYSISDIR)/%.c=$(OBJDIR)/analysis/%.o)
+body_OBJS = $(body_C_FILES:$(bodyDIR)/%.c=$(OBJDIR)/body/%.o)
 
 # LIB_C_FILESからlib接頭辞を除去したパスで.soファイル名を指定
 LIB_SOS = $(patsubst $(LIBDIR)/%.c,$(LIBOBJDIR)/%.so,$(LIB_C_FILES))
@@ -45,18 +45,18 @@ $(STATIC_LIB): $(SRC_OBJS)
 endif
 
 # 実行ファイルのリンク
-$(TARGET): $(ANALYSIS_OBJS) $(LIB_SOS) $(STATIC_LIB)
-	$(CC) -o $@ $(ANALYSIS_OBJS) $(LIB_SOS) -L$(OBJDIR) -lsrc -Wl,-rpath,'$$ORIGIN/../$(LIBOBJDIR)'
+$(TARGET): $(body_OBJS) $(LIB_SOS) $(STATIC_LIB)
+	$(CC) -o $@ $(body_OBJS) $(LIB_SOS) -L$(OBJDIR) -lsrc -Wl,-rpath,'$$ORIGIN/../$(LIBOBJDIR)'
 
 # srcディレクトリの.cファイルをコンパイルしてオブジェクトファイルを作成
 $(OBJDIR)/src/%.o: $(SRCDIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# analysisディレクトリの.cファイルをコンパイルしてオブジェクトファイルを作成
-$(OBJDIR)/analysis/%.o: $(ANALYSISDIR)/%.c
+# bodyディレクトリの.cファイルをコンパイルしてオブジェクトファイルを作成
+$(OBJDIR)/body/%.o: $(bodyDIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# analysis_library内の.cファイルをコンパイルして共有ライブラリを作成
+# dev_program内の.cファイルをコンパイルして共有ライブラリを作成
 $(LIBOBJDIR)/%.so: $(LIBDIR)/%.c
 	@mkdir -p $(dir $@)  # サブディレクトリを作成
 	$(CC) $(CFLAGS_SO) $(LDFLAGS_SO) $< -o $@

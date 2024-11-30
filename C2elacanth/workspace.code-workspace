@@ -3,5 +3,13 @@
 		{
 			"path": "."
 		}
-	]
+	],
+	"settings": {
+		"files.associations": {
+			"stdio.h": "c",
+			"common.h": "c",
+			"custom_common.h": "c",
+			"library_functions.h": "c"
+		}
+	}
 }
