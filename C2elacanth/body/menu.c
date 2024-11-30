@@ -45,7 +45,6 @@ void coelacanth_menu(char* searchString)
 		printf("No matching functions found for '%s'.\n", searchString);
 		return;
 	}
-	printf("%8.3lf us\n", end_time_us());
 
 	DisplayMenu(*copyFunctionsPtr, N_displayFunctions, searchString);
 
