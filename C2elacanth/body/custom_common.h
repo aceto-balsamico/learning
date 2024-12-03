@@ -6,10 +6,11 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdarg.h>
 #include <math.h>
 #include <time.h>
 #include <sys/stat.h>
-#include <stdarg.h>
+#include <limits.h>
 
 
 /* Function prototypes */

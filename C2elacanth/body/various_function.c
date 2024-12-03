@@ -20,28 +20,28 @@ double end_time_us()
 
 void progressBar(int current, int total, int barWidth) 
 {
-    // 進捗を計算
-    float progress = (float)current / total;
-    int progressBarLength = progress * barWidth;
+	// 進捗を計算
+	float progress = (float)current / total;
+	int progressBarLength = progress * barWidth;
 
-    // プログレスバーを構築
-    printf("[");
-    for (int i = 0; i < barWidth; ++i) 
+	// プログレスバーを構築
+	printf("[");
+	for (int i = 0; i < barWidth; ++i) 
 	{
-        if (i < progressBarLength) 
+		if (i < progressBarLength) 
 		{
-            printf("=");
-        }
+			printf("=");
+		}
 		else 
 		{
-            printf(" ");
-        }
-    }
-    printf("] %.2f%%\r", progress * 100); // カーソルを行の先頭に戻す
+			printf(" ");
+		}
+	}
+	printf("] %.2f%%\r", progress * 100); // カーソルを行の先頭に戻す
 
-    if (current == total) 
+	if (current == total) 
 	{
-        printf("\n");
-    }
+		printf("\n");
+	}
 	fflush(stdout);
 }
