@@ -55,7 +55,7 @@ void coelacanth_menu(char* searchString)
 	{
 		printf("\n-> ");
 
-		char input[100] = {};
+		char input[LENGTH128] = {};
 
 		if (fgets(input, sizeof(input), stdin) == NULL)
 		{
