@@ -3,9 +3,9 @@
 
 #define NUM_MACHINES 4
 #define MAX_STEPS 5
-#define MAX_Parallel_Operation 4
-#define MAX_Execution_Count 2
-#define Interleaved_Rate 5
+#define MAX_PARALLEL_OPERATION 4
+#define MAX_EXECUTION_COUNT 2
+#define INTERLEAVED_RATE 5
 
 typedef enum 
 {
@@ -40,11 +40,11 @@ int select_random_machine(Machine machines[], int current_machine_index)
 		}
 	}
 
-	// 使用中の機械がMax_Parallel_Operationを超える場合は-1を返す
-	if(NUM_MACHINES - N_availble_machines >= MAX_Parallel_Operation) {printf("---MAX_Parallel_Operation is over\n"); return -1;}
-	// 使用中の機械がMAX_Execution_Countを超える場合は-1を返す
+	// 使用中の機械がMAX_PARALLEL_OPERATIONを超える場合は-1を返す
+	if(NUM_MACHINES - N_availble_machines >= MAX_PARALLEL_OPERATION) {printf("---MAX_PARALLEL_OPERATION is over\n"); return -1;}
+	// 使用中の機械がMAX_EXECUTION_COUNTを超える場合は-1を返す
 	int selected_machine = available_machines[rand() % N_availble_machines];
-	if(machines[selected_machine].execution_count >= MAX_Execution_Count) {printf("---[%c] is over MAX_Execution_Count\n", machines[selected_machine].name);return -1;}
+	if(machines[selected_machine].execution_count >= MAX_EXECUTION_COUNT) {printf("---[%c] is over MAX_EXECUTION_COUNT\n", machines[selected_machine].name);return -1;}
 
 	// ランダムに1つの機械を選択
 	return selected_machine;
@@ -77,7 +77,7 @@ void Operation_Function(Machine machines[], int current_machine_index)
 		else printf("\t\t\t");
 		printf("Machine %c: Operation step %d\n", current_machine->name, i);
 		
-		if (rand() % Interleaved_Rate == 0) 
+		if (rand() % INTERLEAVED_RATE == 0) 
 		{
 			// OperationFunctionを再帰的に呼び出す
 			Interleaved_Operation(machines, current_machine_index);
