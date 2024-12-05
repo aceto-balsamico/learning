@@ -67,6 +67,7 @@ void Interleaved_Operation(Machine machines[], int current_machine_index)
 void Operation_Function(Machine machines[], int current_machine_index) 
 {
 	Machine *current_machine = &machines[current_machine_index];
+	bool flag_reset = false;
 	current_machine->execution_count++;
 
 	for(int i = 0; i < MAX_STEPS; i++)
@@ -81,6 +82,26 @@ void Operation_Function(Machine machines[], int current_machine_index)
 		{
 			// OperationFunctionを再帰的に呼び出す
 			Interleaved_Operation(machines, current_machine_index);
+		}
+
+		if(rand()%30 == 0)
+		{
+			if(current_machine->name == 'A'){/*  */}
+			else if(current_machine->name == 'B'){printf("\t");}
+			else if(current_machine->name == 'C'){printf("\t\t");}
+			else printf("\t\t\t");
+			printf("------RESET!!---------\n");
+			//Operationを途中で中断してreset:に飛んで関数を終了する
+			flag_reset = true;
+			goto reset;
+		}
+	}
+
+	reset:
+	{
+		if(flag_reset == true)
+		{		
+			return;
 		}
 	}
 }
