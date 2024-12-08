@@ -29,6 +29,7 @@ int select_random_machine(Machine machines[], int current_machine_index)
 {
 	int available_machines[NUM_MACHINES - 1]; // 現在の機械以外を格納
 	int N_availble_machines = 0;
+	int selected_machine = 0; 
 
 	// 使用可能な機械をリストアップ
 	for (int i = 0; i < NUM_MACHINES; i++) 
@@ -41,9 +42,24 @@ int select_random_machine(Machine machines[], int current_machine_index)
 	}
 
 	// 使用中の機械がMAX_PARALLEL_OPERATIONを超える場合は-1を返す
-	if(NUM_MACHINES - N_availble_machines >= MAX_PARALLEL_OPERATION) {printf("---MAX_PARALLEL_OPERATION is over\n"); return -1;}
+	if(NUM_MACHINES - N_availble_machines >= MAX_PARALLEL_OPERATION) 
+	{
+		printf("---MAX_PARALLEL_OPERATION is over\n"); 
+		for (int i = 0; i < NUM_MACHINES; i++) 
+		{
+			if(i != current_machine_index)
+			{
+				available_machines[N_availble_machines] = i;
+				N_availble_machines++;
+			}
+		}
+		selected_machine = available_machines[rand() % N_availble_machines];
+		printf("Wait Finish Busy [%d]\n", selected_machine);
+		// return -1;
+		return selected_machine;
+	}
 	// 使用中の機械がMAX_EXECUTION_COUNTを超える場合は-1を返す
-	int selected_machine = available_machines[rand() % N_availble_machines];
+	selected_machine = available_machines[rand() % N_availble_machines];
 	if(machines[selected_machine].execution_count >= MAX_EXECUTION_COUNT) {printf("---[%c] is over MAX_EXECUTION_COUNT\n", machines[selected_machine].name);return -1;}
 
 	// ランダムに1つの機械を選択
