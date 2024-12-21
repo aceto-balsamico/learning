@@ -1,39 +1,47 @@
-#include <stdio.h>
+#include "custom_common.h"
+typedef struct {
+    unsigned char id;      // ID
+    unsigned char value;   // データ値
+} SmallStruct;
+
+typedef struct {
+    unsigned int id;       // ID
+    unsigned int values[1000]; // データ配列（大きいデータ）
+} LargeStruct;
 
 typedef struct {
     union {
-        unsigned char uc_array[10];  // unsigned char型の配列（10要素）
-        unsigned int ui_array[1000]; // unsigned int型の配列（1000要素）
+        SmallStruct small; // 小さい構造体
+        LargeStruct large; // 大きい構造体
     } data; // 共用体
-    int is_using_ui; // どちらを使用中かを示すフラグ (0: uc_array, 1: ui_array)
+    int is_large; // フラグ (0: SmallStruct, 1: LargeStruct)
 } DataContainer;
 
 // デモ関数
 void demo() {
     DataContainer container;
 
-    // unsigned char型配列を使用する例
-    container.is_using_ui = 0; // フラグを設定
-    for (int i = 0; i < 10; i++) {
-        container.data.uc_array[i] = (unsigned char)(i + 65); // A, B, C...
-    }
-    printf("Using unsigned char array:\n");
-    for (int i = 0; i < 10; i++) {
-        printf("%c ", container.data.uc_array[i]);
-    }
-    printf("\n");
+    // SmallStruct を使用
+    container.is_large = 0; // フラグを設定
+    container.data.small.id = 1;
+    container.data.small.value = 42;
+    printf("Using SmallStruct: id = %d, value = %d\n",
+           container.data.small.id, container.data.small.value);
 
-    // unsigned int型配列を使用する例
-    container.is_using_ui = 1; // フラグを設定
-    for (int i = 0; i < 1000; i++) {
-        container.data.ui_array[i] = i * 10;
+    // LargeStruct を使用
+    container.is_large = 1; // フラグを設定
+    container.data.large.id = 1000;
+    for (int i = 0; i < 10; i++) {
+        container.data.large.values[i] = i * 10;
     }
-    printf("Using unsigned int array:\n");
-    for (int i = 0; i < 10; i++) { // 10個だけ出力
-        printf("%d ", container.data.ui_array[i]);
+    printf("Using LargeStruct: id = %d, values[0..9] =",
+           container.data.large.id);
+    for (int i = 0; i < 10; i++) {
+        printf(" %d", container.data.large.values[i]);
     }
     printf("\n");
 }
+
 //@@@function
 void union_example() 
 {
