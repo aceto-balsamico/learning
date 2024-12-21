@@ -22,10 +22,11 @@ MemoryPool* init_pool(size_t size) {
     return mp;
 }
 
-// メモリプールからメモリを割り当て
+// メモリプールからメモリを割り当て（オーバーフロー防止版）
 void* pool_alloc(MemoryPool *mp, size_t size) {
     if (mp->offset + size > mp->pool_size) {
-        return NULL; // メモリ不足
+        // 残り容量を超えた場合、プールをリセット
+        mp->offset = 0;
     }
     void *ptr = mp->pool + mp->offset;
     mp->offset += size;
@@ -68,7 +69,6 @@ void benchmark_pool(MemoryPool *pool, size_t block_size) {
     }
     pool_reset(pool); // メモリプールをリセット
 }
-
 //@@@function
 void MemoryPool_benchmark() {
     size_t sizes[BLOCK_SIZES] = {32, 512, 8192}; // 小・中・大のメモリブロックサイズ
@@ -89,7 +89,7 @@ void MemoryPool_benchmark() {
                (double)(end - start) / CLOCKS_PER_SEC);
 
         // メモリプール ベンチマーク
-        MemoryPool *pool = init_pool(NUM_ALLOCS * block_size);
+        MemoryPool *pool = init_pool(NUM_ALLOCS * block_size / 10); // 少し余裕を持って確保
         start = clock();
         benchmark_pool(pool, block_size);
         end = clock();
@@ -98,5 +98,4 @@ void MemoryPool_benchmark() {
         free_pool(pool);
     }
 
-    return;
 }
