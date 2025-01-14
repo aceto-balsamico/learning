@@ -7,8 +7,8 @@ CFLAGS_SO = $(CFLAGS) -fPIC
 LDFLAGS_SO = -shared
 
 # ディレクトリ設定
-OBJDIR = obj
-BINDIR = bin
+OBJDIR = ../obj
+BINDIR = ../bin
 SRCDIR = src
 bodyDIR = body
 LIBDIR = dev_program
@@ -46,7 +46,7 @@ endif
 
 # 実行ファイルのリンク
 $(TARGET): $(body_OBJS) $(LIB_SOS) $(STATIC_LIB)
-	$(CC) -o $@ $(body_OBJS) $(LIB_SOS) -L$(OBJDIR) -lsrc -Wl,-rpath,'$$ORIGIN/../$(LIBOBJDIR)'
+	$(CC) -o $@ $(body_OBJS) $(LIB_SOS) -L$(OBJDIR) -lsrc -Wl,-rpath,$(LIBOBJDIR)
 
 # srcディレクトリの.cファイルをコンパイルしてオブジェクトファイルを作成
 $(OBJDIR)/src/%.o: $(SRCDIR)/%.c

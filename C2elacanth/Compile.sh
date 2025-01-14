@@ -84,7 +84,8 @@ setup_ramdisk()
 
 num_jobs=$(sysctl -n hw.logicalcpu)
 # RAMディスク上のディレクトリ作成関数
-setup_ramdisk_dirs() {
+setup_ramdisk_dirs() 
+{
     export OBJDIR="$RAMDISK_MOUNT_POINT/obj"
     export BINDIR="$RAMDISK_MOUNT_POINT/bin"
     

@@ -18,6 +18,7 @@ void GetMultiBlocklist();
 void mandelbrot();
 int WaferMapping();
 void FunctionPtr();
+void separate_value();
 
 typedef struct
 {
@@ -46,6 +47,7 @@ s_FunctionPtr g_FunctionsPtr[] =
     {(void*)mandelbrot, "mandelbrot", "oasobi"},
     {(void*)WaferMapping, "WaferMapping", "oasobi"},
     {(void*)FunctionPtr, "FunctionPtr", "oasobi"},
+    {(void*)separate_value, "separate_value", "oasobi"},
 };
 
 int g_numFunctionsPtr = sizeof(g_FunctionsPtr) / sizeof(g_FunctionsPtr[0]);
