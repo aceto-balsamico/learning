@@ -3,11 +3,9 @@
 
 #define NUM_MACHINES 4
 #define MAX_STEPS 5
-#define MAX_Parallel_Operation 4
-#define MAX_Execution_Count 2
-#define Interleaved_Rate 5
-
-#define testtesttest
+#define MAX_PARALLEL_OPERATION 4
+#define MAX_EXECUTION_COUNT 2
+#define INTERLEAVED_RATE 5
 
 typedef enum 
 {
@@ -31,6 +29,7 @@ int select_random_machine(Machine machines[], int current_machine_index)
 {
 	int available_machines[NUM_MACHINES - 1]; // 現在の機械以外を格納
 	int N_availble_machines = 0;
+	int selected_machine = 0; 
 
 	// 使用可能な機械をリストアップ
 	for (int i = 0; i < NUM_MACHINES; i++) 
@@ -42,11 +41,26 @@ int select_random_machine(Machine machines[], int current_machine_index)
 		}
 	}
 
-	// 使用中の機械がMax_Parallel_Operationを超える場合は-1を返す
-	if(NUM_MACHINES - N_availble_machines >= MAX_Parallel_Operation) {printf("---MAX_Parallel_Operation is over\n"); return -1;}
-	// 使用中の機械がMAX_Execution_Countを超える場合は-1を返す
-	int selected_machine = available_machines[rand() % N_availble_machines];
-	if(machines[selected_machine].execution_count >= MAX_Execution_Count) {printf("---[%c] is over MAX_Execution_Count\n", machines[selected_machine].name);return -1;}
+	// 使用中の機械がMAX_PARALLEL_OPERATIONを超える場合は-1を返す
+	if(NUM_MACHINES - N_availble_machines >= MAX_PARALLEL_OPERATION) 
+	{
+		printf("---MAX_PARALLEL_OPERATION is over\n"); 
+		for (int i = 0; i < NUM_MACHINES; i++) 
+		{
+			if(i != current_machine_index)
+			{
+				available_machines[N_availble_machines] = i;
+				N_availble_machines++;
+			}
+		}
+		selected_machine = available_machines[rand() % N_availble_machines];
+		printf("Wait Finish Busy [%d]\n", selected_machine);
+		// return -1;
+		return selected_machine;
+	}
+	// 使用中の機械がMAX_EXECUTION_COUNTを超える場合は-1を返す
+	selected_machine = available_machines[rand() % N_availble_machines];
+	if(machines[selected_machine].execution_count >= MAX_EXECUTION_COUNT) {printf("---[%c] is over MAX_EXECUTION_COUNT\n", machines[selected_machine].name);return -1;}
 
 	// ランダムに1つの機械を選択
 	return selected_machine;
@@ -69,6 +83,7 @@ void Interleaved_Operation(Machine machines[], int current_machine_index)
 void Operation_Function(Machine machines[], int current_machine_index) 
 {
 	Machine *current_machine = &machines[current_machine_index];
+	bool flag_reset = false;
 	current_machine->execution_count++;
 
 	for(int i = 0; i < MAX_STEPS; i++)
@@ -79,10 +94,30 @@ void Operation_Function(Machine machines[], int current_machine_index)
 		else printf("\t\t\t");
 		printf("Machine %c: Operation step %d\n", current_machine->name, i);
 		
-		if (rand() % Interleaved_Rate == 0) 
+		if (rand() % INTERLEAVED_RATE == 0) 
 		{
 			// OperationFunctionを再帰的に呼び出す
 			Interleaved_Operation(machines, current_machine_index);
+		}
+
+		if(rand()%30 == 0)
+		{
+			if(current_machine->name == 'A'){/*  */}
+			else if(current_machine->name == 'B'){printf("\t");}
+			else if(current_machine->name == 'C'){printf("\t\t");}
+			else printf("\t\t\t");
+			printf("------RESET!!---------\n");
+			//Operationを途中で中断してreset:に飛んで関数を終了する
+			flag_reset = true;
+			goto reset;
+		}
+	}
+
+	reset:
+	{
+		if(flag_reset == true)
+		{		
+			return;
 		}
 	}
 }
