@@ -120,7 +120,7 @@ build_project() {
         esac
     done
 
-	rm obj/body/menu.o
+	rm ../obj/body/menu.o
 
     if $ramdisk_mode; then
         # RAMディスク上でのビルド
@@ -150,6 +150,9 @@ return_value=1
 create_include
 build_project "$@"
 return_value=$?
+
+alias c="./Compile.sh"
+alias r="./Run.sh"
 
 if [ $return_value -eq 0 ]; then
 	echo -e "\033[33m"

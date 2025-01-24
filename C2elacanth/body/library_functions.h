@@ -9,6 +9,9 @@ void stack_function();
 void B_tree();
 void MemoryPool_benchmark();
 void union_example();
+void pthread_test();
+void wrap_pthread();
+void Segment_Integral();
 int change_func_purpose();
 void conways_life_game();
 int custom_scanf();
@@ -19,6 +22,7 @@ void mandelbrot();
 int WaferMapping();
 void FunctionPtr();
 void separate_value();
+void test();
 
 typedef struct
 {
@@ -38,6 +42,9 @@ s_FunctionPtr g_FunctionsPtr[] =
     {(void*)B_tree, "B_tree", "TestFunction"},
     {(void*)MemoryPool_benchmark, "MemoryPool_benchmark", "TestFunction"},
     {(void*)union_example, "union_example", "TestFunction"},
+    {(void*)pthread_test, "pthread_test", "TestFunction"},
+    {(void*)wrap_pthread, "wrap_pthread", "TestFunction"},
+    {(void*)Segment_Integral, "Segment_Integral", "TestFunction"},
     {(void*)change_func_purpose, "change_func_purpose", "oasobi"},
     {(void*)conways_life_game, "conways_life_game", "oasobi"},
     {(void*)custom_scanf, "custom_scanf", "oasobi"},
@@ -48,6 +55,7 @@ s_FunctionPtr g_FunctionsPtr[] =
     {(void*)WaferMapping, "WaferMapping", "oasobi"},
     {(void*)FunctionPtr, "FunctionPtr", "oasobi"},
     {(void*)separate_value, "separate_value", "oasobi"},
+    {(void*)test, "test", "oasobi"},
 };
 
 int g_numFunctionsPtr = sizeof(g_FunctionsPtr) / sizeof(g_FunctionsPtr[0]);
