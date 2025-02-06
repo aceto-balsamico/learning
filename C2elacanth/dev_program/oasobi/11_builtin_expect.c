@@ -10,10 +10,6 @@
 #define ELIF(cond) else if (LIKELY(cond))
 #define ELSE(cond) else { cond }
 
-#define CASE_LIKELY(x)   case LIKELY(x)
-#define CASE_UNLIKELY(x) case UNLIKELY(x)
-
-
 // 時間計測用関数
 double get_time_diff(struct timespec start, struct timespec end)
 {
@@ -57,5 +53,4 @@ void benchmark_LIKELY()
 	printf("Performance improvement: %.2f%%\n",
 		   (1 - (likely_time / normal_time)) * 100);
 
-	return;
 }
