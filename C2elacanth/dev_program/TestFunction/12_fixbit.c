@@ -7,7 +7,7 @@
 // 仮の機械応答関数 (bit固定をシミュレート)
 double machine_response(int input) {
     // 正常なシグモイド関数 (例: 1 / (1 + exp(-0.1 * (x - 64))))
-    double sigmoid = 1.0 / (1.0 + exp(-0.1 * (input - 64)));
+    // double sigmoid = 1.0 / (1.0 + exp(-0.1 * (input - 64)));
     // 例: 6bit目 (0x40) が1固定されている場合を模擬
     int modified_input = input | 0x80; 
     // int modified_input = input; 
