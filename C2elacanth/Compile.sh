@@ -112,7 +112,7 @@ build_project() {
     for arg in "$@"; do
         case $arg in
             -op)
-                compile_options="-O3"
+                compile_options="-O3 -march=native"
                 ;;
             -ram)
                 ramdisk_mode=true
