@@ -11,7 +11,9 @@ void MemoryPool_benchmark();
 void union_example();
 void pthread_test();
 void wrap_pthread();
-void Segment_Integral();
+int Segment_Integral();
+int fixbit();
+void curvature_detection();
 int change_func_purpose();
 void conways_life_game();
 int custom_scanf();
@@ -23,6 +25,12 @@ int WaferMapping();
 void FunctionPtr();
 void separate_value();
 void test();
+void benchmark_LIKELY();
+void malloc_benchmark();
+void DNA_database();
+void rate_menu();
+void improve_rate_menu();
+void Shuffle_Rate_Menu();
 
 typedef struct
 {
@@ -45,6 +53,8 @@ s_FunctionPtr g_FunctionsPtr[] =
     {(void*)pthread_test, "pthread_test", "TestFunction"},
     {(void*)wrap_pthread, "wrap_pthread", "TestFunction"},
     {(void*)Segment_Integral, "Segment_Integral", "TestFunction"},
+    {(void*)fixbit, "fixbit", "TestFunction"},
+    {(void*)curvature_detection, "curvature_detection", "TestFunction"},
     {(void*)change_func_purpose, "change_func_purpose", "oasobi"},
     {(void*)conways_life_game, "conways_life_game", "oasobi"},
     {(void*)custom_scanf, "custom_scanf", "oasobi"},
@@ -56,6 +66,12 @@ s_FunctionPtr g_FunctionsPtr[] =
     {(void*)FunctionPtr, "FunctionPtr", "oasobi"},
     {(void*)separate_value, "separate_value", "oasobi"},
     {(void*)test, "test", "oasobi"},
+    {(void*)benchmark_LIKELY, "benchmark_LIKELY", "oasobi"},
+    {(void*)malloc_benchmark, "malloc_benchmark", "oasobi"},
+    {(void*)DNA_database, "DNA_database", "oasobi"},
+    {(void*)rate_menu, "rate_menu", "oasobi"},
+    {(void*)improve_rate_menu, "improve_rate_menu", "oasobi"},
+    {(void*)Shuffle_Rate_Menu, "Shuffle_Rate_Menu", "oasobi"},
 };
 
 int g_numFunctionsPtr = sizeof(g_FunctionsPtr) / sizeof(g_FunctionsPtr[0]);

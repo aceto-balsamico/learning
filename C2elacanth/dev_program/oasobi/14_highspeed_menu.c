@@ -1,9 +1,5 @@
 #include "custom_common.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
 
 #define MENU_CAPACITY 64
 #define EXPLANATION_LENGTH 32
@@ -74,13 +70,18 @@ void rate_menu()
 	Menu menu;
 	initMenu(&menu);
 
-	append(&menu, 1, 10, "Option 1");
-	append(&menu, 2, 30, "Option 2");
-	append(&menu, 3, 20, "Option 3");
-	append(&menu, 4, 40, "Option 4");
+	// append(&menu, 1, 10, "Option 1");
+	// append(&menu, 2, 30, "Option 2");
+	// append(&menu, 3, 20, "Option 3");
+	// append(&menu, 4, 40, "Option 4");
+
+	for(int i = 0; i < 64; i++)
+	{
+		append(&menu, i + 5, i + 1, "Option 5");
+	}
 
 	// choiceを連続で呼ぶ（重複なし）
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 64; i++)
 	{
 		int result = choice(&menu);
 		if (result == -1)
@@ -92,15 +93,15 @@ void rate_menu()
 	}
 
 	// 再利用
-	printf("Resetting menu...\n");
-	initMenu(&menu);
+	// printf("Resetting menu...\n");
+	// initMenu(&menu);
 
-	append(&menu, 5, 50, "Option 5");
-	append(&menu, 6, 50, "Option 6");
+	// append(&menu, 5, 50, "Option 5");
+	// append(&menu, 6, 50, "Option 6");
 
-	printf("Selected key after reset: %d\n", choice(&menu));
-	printf("Selected key after reset: %d\n", choice(&menu));
-	printf("Selected key after reset: %d\n", choice(&menu));
+	// printf("Selected key after reset: %d\n", choice(&menu));
+	// printf("Selected key after reset: %d\n", choice(&menu));
+	// printf("Selected key after reset: %d\n", choice(&menu));
 
 	return;
 }
