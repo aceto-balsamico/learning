@@ -32,6 +32,7 @@ void rate_menu();
 void improve_rate_menu();
 void Shuffle_Rate_Menu();
 void command_array();
+void state_machine_test();
 
 typedef struct
 {
@@ -74,6 +75,7 @@ s_FunctionPtr g_FunctionsPtr[] =
     {(void*)improve_rate_menu, "improve_rate_menu", "oasobi"},
     {(void*)Shuffle_Rate_Menu, "Shuffle_Rate_Menu", "oasobi"},
     {(void*)command_array, "command_array", "oasobi"},
+    {(void*)state_machine_test, "state_machine_test", "oasobi"},
 };
 
 int g_numFunctionsPtr = sizeof(g_FunctionsPtr) / sizeof(g_FunctionsPtr[0]);
