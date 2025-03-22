@@ -31,6 +31,7 @@ void DNA_database();
 void rate_menu();
 void improve_rate_menu();
 void Shuffle_Rate_Menu();
+void command_array();
 
 typedef struct
 {
@@ -72,6 +73,7 @@ s_FunctionPtr g_FunctionsPtr[] =
     {(void*)rate_menu, "rate_menu", "oasobi"},
     {(void*)improve_rate_menu, "improve_rate_menu", "oasobi"},
     {(void*)Shuffle_Rate_Menu, "Shuffle_Rate_Menu", "oasobi"},
+    {(void*)command_array, "command_array", "oasobi"},
 };
 
 int g_numFunctionsPtr = sizeof(g_FunctionsPtr) / sizeof(g_FunctionsPtr[0]);
