@@ -51,7 +51,8 @@ void add_prohibit(ProhibitManager *pm, unsigned char command)
 {
 	if (pm->used_size < pm->capacity)
 	{
-		pm->prohibited[pm->used_size++] = command;
+		pm->prohibited[pm->used_size] = command;
+		pm->used_size++;
 	}
 }
 
@@ -74,7 +75,7 @@ void add_conflict(ConflictManager *cm, unsigned char cmd1, unsigned char cmd2)
 
 void shuffle_commands(CommandManager *cm)
 {
-	for (size_t i = cm->used_size - 1; i > 0; --i)
+	for (size_t i = cm->used_size - 1; i > 0; i--)
 	{
 		size_t j = rand() % (i + 1);
 		unsigned char temp = cm->commands[i];
@@ -85,29 +86,31 @@ void shuffle_commands(CommandManager *cm)
 
 void resolve_conflicts(CommandManager *cm, ProhibitManager *pm, ConflictManager *cfm)
 {
-	for (size_t i = 0; i < cm->used_size; ++i)
+	for (size_t i = 0; i < cm->used_size; i++)
 	{
 		// Prohibited command check
-		for (size_t j = 0; j < pm->used_size; ++j)
+		for (size_t j = 0; j < pm->used_size; j++)
 		{
 			if (cm->commands[i] == pm->prohibited[j])
 			{
-				cm->commands[i] = cm->commands[--cm->used_size];
-				--i;
+				cm->used_size--;
+				cm->commands[i] = cm->commands[cm->used_size];
+				i--;
 				break;
 			}
 		}
 
 		// Conflict command check
-		for (size_t j = 0; j < cfm->used_size; ++j)
+		for (size_t j = 0; j < cfm->used_size; j++)
 		{
-			for (size_t k = i + 1; k < cm->used_size; ++k)
+			for (size_t k = i + 1; k < cm->used_size; k++)
 			{
 				if ((cm->commands[i] == cfm->conflicts[j][0] && cm->commands[k] == cfm->conflicts[j][1]) ||
 					(cm->commands[i] == cfm->conflicts[j][1] && cm->commands[k] == cfm->conflicts[j][0]))
-				{
-					cm->commands[k] = cm->commands[--cm->used_size];
-					--k;
+					{
+					cm->used_size--;
+					cm->commands[k] = cm->commands[cm->used_size];
+					k--;
 				}
 			}
 		}
@@ -116,7 +119,7 @@ void resolve_conflicts(CommandManager *cm, ProhibitManager *pm, ConflictManager 
 
 void print_commands(CommandManager *cm)
 {
-	for (size_t i = 0; i < cm->used_size; ++i)
+	for (size_t i = 0; i < cm->used_size; i++)
 	{
 		printf("%02X ", cm->commands[i]);
 	}
@@ -149,7 +152,7 @@ void command_array()
 	init_conflict_manager(&cfm, MAX_CONFLICTS);
 
 	// コマンド追加
-	for (unsigned char i = 0x01; i <= 0x20; ++i)
+	for (unsigned char i = 0x01; i <= 0x20; i++)
 	{
 		append_command(&cm, i);
 	}
@@ -186,7 +189,7 @@ void command_array()
 	{
 		printf("false\n");
 	}
-	
+
 	printf("after size\n");
 	cm.used_size = 4;
 	print_commands(&cm);
