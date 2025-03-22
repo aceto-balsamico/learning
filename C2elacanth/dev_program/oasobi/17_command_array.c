@@ -1,73 +1,81 @@
-#include "custom_common.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
 #define MAX_COMMANDS 256
-#define MAX_PROHIBITED 256
+#define MAX_PROHIBITS 256
 #define MAX_CONFLICTS 256
 
-// SoA構造体定義
-struct CommandManager
+typedef struct
 {
-	unsigned char *commands; // コマンド配列
-	size_t used_size;		 // 現在使用中のコマンド数
-	size_t max_size;		 // コマンド配列の最大容量
-};
+	unsigned char *commands;
+	size_t used_size;
+	size_t capacity;
+} CommandManager;
 
-// 禁止コマンド管理
-unsigned char prohibited[MAX_PROHIBITED];
-size_t prohibited_count = 0;
-
-// 組み合わせ禁止管理
-unsigned char conflicts[MAX_CONFLICTS][2];
-size_t conflict_count = 0;
-
-// コマンドマネージャーの初期化
-void init_command_manager(struct CommandManager *cm, size_t max_size)
+typedef struct
 {
-	cm->commands = (unsigned char *)malloc(max_size * sizeof(unsigned char));
+	unsigned char *prohibited;
+	size_t used_size;
+	size_t capacity;
+} ProhibitManager;
+
+typedef struct
+{
+	unsigned char (*conflicts)[2];
+	size_t used_size;
+	size_t capacity;
+} ConflictManager;
+
+void init_command_manager(CommandManager *cm, size_t capacity)
+{
+	cm->commands = malloc(capacity);
 	cm->used_size = 0;
-	cm->max_size = max_size;
+	cm->capacity = capacity;
 }
 
-// コマンドマネージャーの解放
-void free_command_manager(struct CommandManager *cm)
+void append_command(CommandManager *cm, unsigned char command)
 {
-	free(cm->commands);
-	cm->commands = NULL;
-	cm->used_size = 0;
-	cm->max_size = 0;
-}
-
-// コマンド追加関数
-void add_command(struct CommandManager *cm, unsigned char command)
-{
-	if (cm->used_size < cm->max_size)
+	if (cm->used_size < cm->capacity)
 	{
 		cm->commands[cm->used_size++] = command;
 	}
 }
 
-// 禁止コマンド追加関数
-void add_prohibited_command(unsigned char command)
+void init_prohibit_manager(ProhibitManager *pm, size_t capacity)
 {
-	if (prohibited_count < MAX_PROHIBITED)
+	pm->prohibited = malloc(capacity);
+	pm->used_size = 0;
+	pm->capacity = capacity;
+}
+
+void add_prohibit(ProhibitManager *pm, unsigned char command)
+{
+	if (pm->used_size < pm->capacity)
 	{
-		prohibited[prohibited_count++] = command;
+		pm->prohibited[pm->used_size++] = command;
 	}
 }
 
-// 組み合わせ禁止追加関数
-void add_conflict_pair(unsigned char a, unsigned char b)
+void init_conflict_manager(ConflictManager *cm, size_t capacity)
 {
-	if (conflict_count < MAX_CONFLICTS)
+	cm->conflicts = malloc(capacity * 2);
+	cm->used_size = 0;
+	cm->capacity = capacity;
+}
+
+void add_conflict(ConflictManager *cm, unsigned char cmd1, unsigned char cmd2)
+{
+	if (cm->used_size < cm->capacity)
 	{
-		conflicts[conflict_count][0] = a;
-		conflicts[conflict_count][1] = b;
-		conflict_count++;
+		cm->conflicts[cm->used_size][0] = cmd1;
+		cm->conflicts[cm->used_size][1] = cmd2;
+		cm->used_size++;
 	}
 }
 
-// 配列のシャッフル関数
-void shuffle_commands(struct CommandManager *cm)
+void shuffle_commands(CommandManager *cm)
 {
 	for (size_t i = cm->used_size - 1; i > 0; --i)
 	{
@@ -78,56 +86,38 @@ void shuffle_commands(struct CommandManager *cm)
 	}
 }
 
-// 禁止コマンドチェック関数
-int is_prohibited(unsigned char command)
+void resolve_conflicts(CommandManager *cm, ProhibitManager *pm, ConflictManager *cfm)
 {
-	for (size_t i = 0; i < prohibited_count; ++i)
+	for (size_t i = 0; i < cm->used_size; ++i)
 	{
-		if (command == prohibited[i])
-			return 1;
-	}
-	return 0;
-}
-
-// 組み合わせ禁止チェック関数
-int check_conflict(unsigned char a, unsigned char b)
-{
-	for (size_t i = 0; i < conflict_count; ++i)
-	{
-		if ((a == conflicts[i][0] && b == conflicts[i][1]) ||
-			(a == conflicts[i][1] && b == conflicts[i][0]))
+		// Prohibited command check
+		for (size_t j = 0; j < pm->used_size; ++j)
 		{
-			return 1;
-		}
-	}
-	return 0;
-}
-
-// 禁止コマンドと組み合わせ禁止コマンドのフィルタリング
-void filter_commands(struct CommandManager *cm)
-{
-	for (size_t i = 0; i < cm->used_size;)
-	{
-		if (is_prohibited(cm->commands[i]))
-		{
-			cm->commands[i] = cm->commands[--cm->used_size];
-			continue;
-		}
-
-		for (size_t j = i + 1; j < cm->used_size; ++j)
-		{
-			if (check_conflict(cm->commands[i], cm->commands[j]))
+			if (cm->commands[i] == pm->prohibited[j])
 			{
-				cm->commands[j] = cm->commands[--cm->used_size];
+				cm->commands[i] = cm->commands[--cm->used_size];
+				--i;
 				break;
 			}
 		}
-		++i;
+
+		// Conflict command check
+		for (size_t j = 0; j < cfm->used_size; ++j)
+		{
+			for (size_t k = i + 1; k < cm->used_size; ++k)
+			{
+				if ((cm->commands[i] == cfm->conflicts[j][0] && cm->commands[k] == cfm->conflicts[j][1]) ||
+					(cm->commands[i] == cfm->conflicts[j][1] && cm->commands[k] == cfm->conflicts[j][0]))
+				{
+					cm->commands[k] = cm->commands[--cm->used_size];
+					--k;
+				}
+			}
+		}
 	}
 }
 
-// コマンドの表示関数
-void print_commands(struct CommandManager *cm)
+void print_commands(CommandManager *cm)
 {
 	for (size_t i = 0; i < cm->used_size; ++i)
 	{
@@ -135,44 +125,59 @@ void print_commands(struct CommandManager *cm)
 	}
 	printf("\n");
 }
-
 //@@@function
-void command_array(void)
+void command_array()
 {
 	srand((unsigned int)time(NULL));
 
-	struct CommandManager cm;
+	CommandManager cm;
+	ProhibitManager pm;
+	ConflictManager cfm;
+
 	init_command_manager(&cm, MAX_COMMANDS);
+	init_prohibit_manager(&pm, MAX_PROHIBITS);
+	init_conflict_manager(&cfm, MAX_CONFLICTS);
 
-	for (unsigned char i = 0; i < 16; ++i)
+	// コマンド追加
+	for (unsigned char i = 0x01; i <= 0x20; ++i)
 	{
-		add_command(&cm, i);
+		append_command(&cm, i);
 	}
-
-	// 禁止コマンドの追加
-	add_prohibited_command(0x0C);
-	add_prohibited_command(0x25);
-	add_prohibited_command(0x2A);
-
-	// 組み合わせ禁止コマンドの追加
-	add_conflict_pair(0x06, 0x04); // 0x06があれば0x04は禁止
-	add_conflict_pair(0x0F, 0x0D); // 0x0Fがあれば0x0Dは禁止
-
-	printf("Original Commands:\n");
 	print_commands(&cm);
 
+	// 禁止コマンド追加
+	add_prohibit(&pm, 0x02);
+	add_prohibit(&pm, 0x15);
+	add_prohibit(&pm, 0x2A);
+
+	printf("after resolve\n");
+	resolve_conflicts(&cm, &pm, &cfm);
+	print_commands(&cm);
+
+	// 組み合わせ禁止コマンド追加
+	add_conflict(&cfm, 0x04, 0x1F);
+	add_conflict(&cfm, 0x14, 0x09);
+	add_conflict(&cfm, 0x19, 0x12);
+
+	// コマンドシャッフルと競合解決
+	printf("shuffle\n");
 	shuffle_commands(&cm);
-	printf("\nShuffled Commands:\n");
 	print_commands(&cm);
 
-	filter_commands(&cm);
-	printf("\nFiltered Commands:\n");
+	printf("after resolve\n");
+	resolve_conflicts(&cm, &pm, &cfm);
 	print_commands(&cm);
+
+	printf("after size\n");
 	cm.used_size = 4;
 	print_commands(&cm);
 	shuffle_commands(&cm);
 	print_commands(&cm);
 
-	free_command_manager(&cm);
+	// メモリ解放
+	free(cm.commands);
+	free(pm.prohibited);
+	free(cfm.conflicts);
+
 	return;
 }
