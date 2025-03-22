@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
+#include "custom_common.h"
 
 #define MAX_COMMANDS 256
 #define MAX_PROHIBITS 256
@@ -125,6 +122,19 @@ void print_commands(CommandManager *cm)
 	}
 	printf("\n");
 }
+
+int has_command(CommandManager *arr, unsigned char command)
+{
+	for (size_t i = 0; i < arr->used_size; i++)
+	{
+		if (arr->commands[i] == command)
+		{
+			return 1; // true
+		}
+	}
+	return 0; // false
+}
+
 //@@@function
 void command_array()
 {
@@ -168,11 +178,21 @@ void command_array()
 	resolve_conflicts(&cm, &pm, &cfm);
 	print_commands(&cm);
 
+	if(has_command(&cm, 0x12) == true)
+	{
+		printf("true\n");
+	}
+	else
+	{
+		printf("false\n");
+	}
+	
 	printf("after size\n");
 	cm.used_size = 4;
 	print_commands(&cm);
 	shuffle_commands(&cm);
 	print_commands(&cm);
+
 
 	// メモリ解放
 	free(cm.commands);
